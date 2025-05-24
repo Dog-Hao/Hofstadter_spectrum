@@ -357,8 +357,6 @@ if __name__=='__main__':
     Chern = Cal_Chern_number(p, q, nb_start, nb_end)
     
     
-    # Fmat_ipq = Cal_Fmat(1, 4)
-    
     
     
 
