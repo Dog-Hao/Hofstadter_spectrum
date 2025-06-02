@@ -3,3 +3,5 @@
 (b) The lattice can be arbitrary by providing a1=[a1x>0, a1y] (a2=[0, 1] is fixed).
 
 (c) The Bloch Landau levels are chosen as the basis, whose cutoff (NLL) can be as huge as >500.
+
+(d) For TBG, additional indices appear from layer and sublattice, and one should be careful to use different LL cutoffs in different sublattices.
