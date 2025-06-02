@@ -288,7 +288,7 @@ def Cal_Chern_number(p,q,nb_start,nb_end):
     
     return Chern
     
-def Collect_spectrum(qmax,numk_max):
+def Collect_spectrum(qmax,numk):
     # collect the energy data at different flux
     
     pq_list = Generate_pq_list(qmax)
@@ -300,8 +300,6 @@ def Collect_spectrum(qmax,numk_max):
         t1 = time.time()
         p = pq_list[ipq,0]
         q = pq_list[ipq,1]
-        
-        numk = round(np.ceil(numk_max/q))
         
         k1_list = np.linspace(0.0,1.0/q,numk+1)[:numk]        # k1 in [0,1/q) for q-fold degeneracy
         k2_list = np.linspace(0.0,1.0,numk+1)[:numk]
