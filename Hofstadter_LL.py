@@ -347,7 +347,7 @@ def Cal_Chern_number(p,q,nb_start,nb_end):
 ###############################################################################
 if __name__=='__main__':
     
-    # phi_list, E_list = Collect_spectrum(12, 12)
+    # phi_list, E_list = Collect_spectrum(12, 4)
     # Plot_butterfly(phi_list,E_list,-3.0,2.0)
     
     p = 1
