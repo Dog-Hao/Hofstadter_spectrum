@@ -155,6 +155,7 @@ def Cal_Hamk(k1,k2,p,q,Tmat,Fmat,HSmat):
     
     return Hamk
 
+
 def Plot_band(p,q,nb_start,nb_end):
     # calculate the magnetic band for a specific flux phi=p/q
     
@@ -190,7 +191,62 @@ def Plot_band(p,q,nb_start,nb_end):
     plt.xlabel('k2')
     plt.title('band at flux = p/q ='+str(p)+'/'+str(q)+' along g2 direction')
     plt.show()
+
+
+def Collect_spectrum(qmax,numk):
+    # collect the energy data at different flux
     
+    pq_list = Generate_pq_list(qmax)
+    num_pq = np.shape(pq_list)[0]
+    print('totally',num_pq,'(p, q) pairs')
+    phi_list = []
+    E_list = []
+    for ipq in range(num_pq):
+        t1 = time.time()
+        p = pq_list[ipq,0]
+        q = pq_list[ipq,1]
+        
+        k1_list = np.linspace(0.0,1.0/2/q,numk)        # k1 in [0,1/q) for q-fold degeneracy
+        k2_list = np.linspace(0.0,1.0/2,numk)
+        
+        Tmat_ipq = Cal_Tmat(p, q)
+        Fmat_ipq = Cal_Fmat(p, q)
+        HSmat_ipq = Cal_HSmat(p, q)
+        
+        E_ipq = np.zeros((numk,numk,p*structure.NLL))
+        for ik1 in range(numk):
+            for ik2 in range(numk):
+                
+                k1 = k1_list[ik1]
+                k2 = k2_list[ik2]
+                Hamk = Cal_Hamk(k1, k2, p, q, Tmat_ipq, Fmat_ipq, HSmat_ipq)
+                E, _ = eigh(Hamk)
+                E_ipq[ik1,ik2,:] = E
+                
+        E_ipq = np.reshape(E_ipq,(np.size(E_ipq),))
+        phi_list.append(p/q)
+        E_list.append(E_ipq)
+        t2 = time.time()
+        print(ipq,'-th pair: (p, q) =',p,q, 'finished, used',t2-t1,'seconds' )
+    
+    return phi_list, E_list
+
+
+def Plot_butterfly(phi_list,E_list,Ecut_lower,Ecut_upper):
+    # plot the energy spectrum v.s. flux
+    
+    num_pq = np.shape(phi_list)[0]
+    for ipq in range(num_pq):
+        phi_ipq = phi_list[ipq]
+        E_ipq = E_list[ipq]
+        E_ipq = E_ipq[E_ipq>Ecut_lower]
+        E_ipq = E_ipq[E_ipq<Ecut_upper]
+        nE_ipq = np.size(E_ipq)
+        plt.plot(phi_ipq*np.ones(nE_ipq),E_ipq,'k.',markersize=0.8)
+    plt.ylim([Ecut_lower,Ecut_upper])
+    plt.show()
+
+
 def Cal_Chern_number(p,q,nb_start,nb_end):
     
     lB = np.sqrt(0.5*structure.S0/structure.pi*q/p)
@@ -287,59 +343,6 @@ def Cal_Chern_number(p,q,nb_start,nb_end):
     print('Chern number =', Chern)
     
     return Chern
-    
-def Collect_spectrum(qmax,numk):
-    # collect the energy data at different flux
-    
-    pq_list = Generate_pq_list(qmax)
-    num_pq = np.shape(pq_list)[0]
-    print('totally',num_pq,'(p, q) pairs')
-    phi_list = []
-    E_list = []
-    for ipq in range(num_pq):
-        t1 = time.time()
-        p = pq_list[ipq,0]
-        q = pq_list[ipq,1]
-        
-        k1_list = np.linspace(0.0,1.0/q,numk+1)[:numk]        # k1 in [0,1/q) for q-fold degeneracy
-        k2_list = np.linspace(0.0,1.0,numk+1)[:numk]
-        
-        Tmat_ipq = Cal_Tmat(p, q)
-        Fmat_ipq = Cal_Fmat(p, q)
-        HSmat_ipq = Cal_HSmat(p, q)
-        
-        E_ipq = np.zeros((numk,numk,p*structure.NLL))
-        for ik1 in range(numk):
-            for ik2 in range(numk):
-                
-                k1 = k1_list[ik1]
-                k2 = k2_list[ik2]
-                Hamk = Cal_Hamk(k1, k2, p, q, Tmat_ipq, Fmat_ipq, HSmat_ipq)
-                E, _ = eigh(Hamk)
-                E_ipq[ik1,ik2,:] = E
-                
-        E_ipq = np.reshape(E_ipq,(np.size(E_ipq),))
-        phi_list.append(p/q)
-        E_list.append(E_ipq)
-        t2 = time.time()
-        print(ipq,'-th pair: (p, q) =',p,q, 'finished, used',t2-t1,'seconds' )
-    
-    return phi_list, E_list
-
-def Plot_butterfly(phi_list,E_list,Ecut_lower,Ecut_upper):
-    # plot the energy spectrum v.s. flux
-    
-    num_pq = np.shape(phi_list)[0]
-    for ipq in range(num_pq):
-        phi_ipq = phi_list[ipq]
-        E_ipq = E_list[ipq]
-        E_ipq = E_ipq[E_ipq>Ecut_lower]
-        E_ipq = E_ipq[E_ipq<Ecut_upper]
-        nE_ipq = np.size(E_ipq)
-        plt.plot(phi_ipq*np.ones(nE_ipq),E_ipq,'k.',markersize=0.8)
-    plt.ylim([Ecut_lower,Ecut_upper])
-    plt.show()
-    
     
 ###############################################################################
 if __name__=='__main__':
