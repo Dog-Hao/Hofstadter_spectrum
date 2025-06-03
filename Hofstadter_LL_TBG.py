@@ -13,7 +13,7 @@ import time
 class structure():
     # define the lattice vectors and basic parameters
     
-    theta_d = 1.82
+    theta_d = 1.5
     pi = np.pi
     a0 = 2.46       # [A]
     theta_r = theta_d/180*pi
@@ -54,7 +54,7 @@ class structure():
     Pot_coef = np.array([T1, T2, T3])
     
     # Landaul level (LL) cutoff
-    NLL = 60
+    NLL = 200
     
     delete_p = [2*NLL-1, 4*NLL-1]
     delete_n = [1*NLL-1, 3*NLL-1]
@@ -235,7 +235,7 @@ def Plot_band(p, q, nb_start, nb_end, valley):
     Fmat = Cal_Fmat(p, q, valley)
     HSmat = Cal_HSmat(p, q, valley)
     
-    num_k1 = 80
+    num_k1 = 30
     num_k2 = 30
     k1_list = np.linspace(0.0,1.0,num_k1)
     k2_list = np.linspace(0.0,1.0,num_k2)
@@ -249,6 +249,7 @@ def Plot_band(p, q, nb_start, nb_end, valley):
             Hamk_tmp = Cal_Hamk(k1_tmp, k2_tmp, p, q, Tmat, Fmat, HSmat, valley)
             Ek_tmp, _ = eigh(Hamk_tmp)
             Eband[ik1,ik2,:] = Ek_tmp[nb_start:nb_end]
+            print(ik1,ik2)
     
     for ik2 in range(num_k2):
         plt.plot(k1_list, Eband[:,ik2,:])
@@ -275,9 +276,9 @@ def Collect_spectrum(qmax, numk, valley):
         t1 = time.time()
         p = pq_list[ipq,0]
         q = pq_list[ipq,1]
-                
-        k1_list = np.linspace(0.0,1.0/q,numk+1)[:numk]        # k1 in [0,1/q) for q-fold degeneracy
-        k2_list = np.linspace(0.0,1.0,numk+1)[:numk]
+        
+        k1_list = np.linspace(0.0,1.0/2/q,numk)        # k1 in [0,1/q) for q-fold degeneracy
+        k2_list = np.linspace(0.0,1.0/2,numk)
         
         Tmat_ipq = Cal_Tmat(p, q, valley)
         Fmat_ipq = Cal_Fmat(p, q, valley)
@@ -431,15 +432,15 @@ def Cal_Chern_number(p, q, nb_start, nb_end, valley):
 if __name__=='__main__':
     
     valley = 1
-    phi_list, E_list = Collect_spectrum(12, 4, valley)
-    Plot_butterfly(phi_list,E_list,-0.35,0.35)
+    phi_list, E_list = Collect_spectrum(15, 4, valley)
+    Plot_butterfly(phi_list,E_list,-0.2,0.2)
     
     # p = 1
-    # q = 3
+    # q = 1
     # valley = +1
     # nb_start = (2*structure.NLL-1)*p-1
     # nb_end = (2*structure.NLL-1)*p+1
-    # # Plot_band(p,q,nb_start,nb_end, valley)
+    # Plot_band(p,q,nb_start,nb_end, valley)
     # Chern = Cal_Chern_number(p, q, nb_start, nb_end, valley)
     
     
